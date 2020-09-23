@@ -1,6 +1,17 @@
 #!/usr/bin/env lua5.3
 -- simple game vaguely remniscient of Geometry Dash made using LuaSDL --
 
+--# Configuration #--
+
+-- Set this to true if you have a fast computer (i.e. most x86 machines).
+-- I've set it to false by default because this is intended to run on the
+-- PinePhone, which is... not nearly as fast.
+-- It is important to note that having this option disabled on a capable
+-- machine will make the game less playable.
+local fast = false
+
+--# End of Configuration #--
+
 local sdl = require("SDL")
 local img = require("SDL.image")
 local ttf = require("SDL.ttf")
@@ -16,6 +27,7 @@ do
 end
 
 print(string.format("Running on SDL %d.%d.%d", sdl.VERSION_MAJOR, sdl.VERSION_MINOR, sdl.VERSION_PATCH))
+print(fast and "Fast mode: yes" or "Fast mode: no")
 print("Creating window")
 
 local win = assert(sdl.createWindow({
@@ -148,8 +160,8 @@ while run do
 
   -- limit FPS so as to actually improve it
   local cur = os.clock()
-  if cur - last_draw >= 0.005 then last_draw = cur render() end
-  if b then sdl.delay(3) else sdl.delay(2) end b = not b
+  if cur - last_draw >= (fast and 0.001 or 0.005) then last_draw = cur render() end
+  if b then sdl.delay(fast and 4 or 3) else sdl.delay(fast and 3 or 2) end b = not b
 end
 
 if not run then goto exit end
